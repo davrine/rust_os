@@ -4,7 +4,7 @@ mod vga_buffer;
 
 use core::panic::PanicInfo;
 
-static HELLO: &[u8] = b"Hello World!";
+// static HELLO: &[u8] = b"Hello World!";
 // Entry point into OS
 #[no_mangle]
 pub extern "C" fn _start() -> ! {

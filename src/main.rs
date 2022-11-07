@@ -22,14 +22,19 @@ use core::panic::PanicInfo;
 // Entry point into OS
 #[no_mangle]
 pub extern "C" fn _start() -> ! {
-    use core::fmt::Write;
-    vga_buffer::WRITER.lock().write_str("Booted").unwrap();
-    write!(vga_buffer::WRITER.lock(), "numbers {} and {}", 1, 2).unwrap();
-    loop {}
+    // use core::fmt::Write;
+
+    println!("Hello my name is jeff im {}", 12);
+    panic!("AAAHHHHHHHH");
+    // vga_buffer::WRITER.lock().write_str("Booted").unwrap(); // WAYS TO PRINT WITHOUT MACROS
+    // write!(vga_buffer::WRITER.lock(), "numbers {} and {}", 1, 2).unwrap();
+
+    // loop {}
 }
 
 // This function is called on panic.
 #[panic_handler]
-fn panic(_info: &PanicInfo) -> ! {
+fn panic(info: &PanicInfo) -> ! {
+    println!("{}", info);
     loop {}
 }

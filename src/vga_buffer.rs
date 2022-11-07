@@ -1,13 +1,15 @@
+use spin::Mutex;
 use volatile::Volatile; // The reason why Volitile is required is because the copiler sees that we only write to ir and never read from it
                         // the rust compiler doesnt know that were not accessing ram but instead accessing the vga memorybuffer so its possible that newer versions of the
                         // rust compiler might erronously optimze this by thinking its usless and removing it
+
 use lazy_static::lazy_static;
-lazy_static! {
-    pub static ref WRITER: Writer = Writer {
+lazy_static! { // for clarifcation as to why this is usfull look at https://os.phil-opp.com/vga-text-mode/ search for the keyword static
+    pub static ref WRITER: Mutex<Writer> = Mutex::new(Writer {// ref keyword specifies that WRITER will be a reference
         column_position: 0,
-        color_code: ColorCode::new(Color::Yellow, Color::Black),
+        color_code: ColorCode::new(Color::Green, Color::Black),
         buffer: unsafe { &mut *(0xb8000 as *mut Buffer) },
-    };
+    });
 }
 
 #[allow(dead_code)]
@@ -128,16 +130,21 @@ impl fmt::Write for Writer {
     }
 }
 
-pub fn print_something() {
-    use core::fmt::Write;
-    let mut writer = Writer {
-        column_position: 0,
-        color_code: ColorCode::new(Color::Yellow, Color::Black),
-        buffer: unsafe { &mut *(0xb8000 as *mut Buffer) }, // It first creates a new Writer that points to the VGA buffer at 0xb8000. The syntax for this might seem a bit strange: First, we cast the integer 0xb8000 as a mutable raw pointer. Then
-                                                           //we convert it to a mutable reference by dereferencing it (through *) and immediately borrowing it again (through &mut)
-    };
-    writer.write_byte(b'H');
-    writer.write_string("ello ");
-    writer.write_string("Wörld!");
-    write!(writer, "The numbers are {} and {}", 42, 1.0 / 3.0).unwrap();
-}
+// Below code was test function for printing ascii chars to screen
+
+// pub fn print_something() {
+//     use core::fmt::Write;
+//     let mut writer = Writer {
+//         column_position: 0,
+//         color_code: ColorCode::new(Color::Yellow, Color::Black),
+//         buffer: unsafe { &mut *(0xb8000 as *mut Buffer) }, // It first creates a new Writer that points to the VGA buffer at 0xb8000. The syntax for this might seem a bit strange: First, we cast the integer 0xb8000 as a mutable raw pointer. Then
+//                                                            //we convert it to a mutable reference by dereferencing it (through *) and immediately borrowing it again (through &mut)
+//     };
+//     writer.write_byte(b'H');
+//     writer.write_string("ello ");
+//     writer.write_string("Wörld!");
+//     write!(writer, "The numbers are {} and {}", 42, 1.0 / 3.0).unwrap();
+// }
+
+
+
